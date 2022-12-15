@@ -11,6 +11,16 @@ int open_pipes(char *str)
 	if (i > 0 && (str[0] == '|' || str[i - 1] == '|'))
 		return(0);
 	i = 0;
+    if (str[i] == ' ')
+    {
+        while (str[i] == ' ')
+        {
+            i ++;
+            if (str[i] == '|')
+                return(0);
+        }
+    }
+    i = 0;
 	while (str[i])
 	{
 		if (str[i] == '|')
@@ -394,7 +404,7 @@ int main()
 	char **splited_argv2;
 	int i = 0;
 
-	ft_memcpy(str, "ls wc-l|", 9);
+	ft_memcpy(str, "  | ls wc-l", 12);
 	if (open_quotes(str) < 0)
 	{
 		printf("Minishell: Syntax error\n");
