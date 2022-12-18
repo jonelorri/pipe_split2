@@ -202,13 +202,13 @@ int	check_mtrx_pipe(char **mtrx)
 	}
 	if (word == i)
 		return (0);
-	i = 0;
-	while (mtrx[i])
-	{
-		free(mtrx[i]);
-		i ++;
-	}
-	free(mtrx);
+	// i = 0;
+	// while (mtrx[i])
+	// {
+	// 	free(mtrx[i]);
+	// 	i ++;
+	// }
+	// free(mtrx);
 	printf("Minishell: Syntax error\n");
 	return (1);
 }
@@ -381,16 +381,21 @@ char	**ft_split_quotes(char *str)
 	char **splited_argv;
 	char *new_str;
 
-	change_caracter2(str);
-	// printf("%s\n", str);
-	new_str = ft_replace(str, ' ' -128);
+	caracter_value = change_caracter2(str);
+	printf("%s\n", str);
+	printf("%d\n", caracter_value);
+	printf("--------\n");
+	// new_str = ft_replace(str, ' ' -128);
 	// printf("%s\n", new_str);
-	caracter_value = change_caracter_q(new_str);
+	// caracter_value = change_caracter_q(new_str);
 	if (caracter_value > 0)
 	{
-		splited_argv = ft_split(new_str, -128);
+		splited_argv = ft_split(str, ' ' -128);
 		if(check_mtrx_pipe(splited_argv))
-			return (0);
+		{
+			splited_argv[0][0] = -12;
+			return (splited_argv);
+		}
 	}
 	else
 		splited_argv = NULL;
@@ -404,7 +409,7 @@ int main()
 	char **splited_argv2;
 	int i = 0;
 
-	ft_memcpy(str, "  | ls wc-l", 12);
+	ft_memcpy(str, "l   ˜  read wc -l", 17);
 	if (open_quotes(str) < 0)
 	{
 		printf("Minishell: Syntax error\n");
@@ -413,11 +418,27 @@ int main()
 	else
 	{
 		// Split Pipes
-		splited_argv = ft_split_pipes(str);
-		if (!splited_argv)
-			printf("NO habia pipes\n");
-		else
-			printf("Habia pipes\n");
+		// splited_argv = ft_split_pipes(str);
+		// if (!splited_argv)
+		// 	printf("NO habia pipes\n");
+		// else
+		// 	printf("Habia pipes\n");
+		splited_argv2 = ft_split_quotes(str);
+		if (splited_argv2[0][0] == -12)
+		{
+			return(0);
+		}
+		if (splited_argv2)
+		{
+			while(splited_argv2[i])
+			{
+				printf("%s\n", splited_argv2[i]);
+				free(splited_argv2[i]);
+				i ++;
+			}
+			free(splited_argv2);
+		}
+
 	}
 
 
@@ -446,7 +467,7 @@ int main()
 	// 		free(splited_argv[i]);
 	// 		i ++;
 	// 	}
-	// 	free(splited_argv);
+	// 	free(splited_argv2);
 	// }
 	return (0);
 }
