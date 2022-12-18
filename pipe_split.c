@@ -409,7 +409,7 @@ int main()
 	char **splited_argv2;
 	int i = 0;
 
-	ft_memcpy(str, "l   ˜  read wc -l", 17);
+	ft_memcpy(str, "echo -n \"wc\"hola", 17);
 	if (open_quotes(str) < 0)
 	{
 		printf("Minishell: Syntax error\n");
