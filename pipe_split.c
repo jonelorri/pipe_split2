@@ -465,6 +465,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 		return (NULL);
 	ft_strlcpy(dest, s1, s1_len + 1);
 	ft_strlcat(&dest[s1_len], s2, s2_len + 1);
+	free((char*)s1);
 	return (dest);
 }
 
@@ -505,7 +506,7 @@ int main()
 	char **splited_argv2;
 	int i = 0;
 
-	ft_memcpy(str, "echo -n \'w\"c\'hola", 19);
+	ft_memcpy(str, "echo -n wc\'ho\'la", 19);
 	if (open_quotes(str) < 0)
 	{
 		printf("Minishell: Syntax error\n");
