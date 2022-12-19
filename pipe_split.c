@@ -1,6 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// size_t	ft_strlen(const char *str)
+// {
+// 	size_t i;
+	
+// 	i = 0;
+// 	while (str[i] != '\0')
+// 		i++;
+// 	return(i);
+// }
+
 int open_pipes(char *str)
 {
 	int		i;
@@ -172,7 +182,7 @@ int change_caracter_q(char *str)
 			quote = 'x';
 		i ++;
 	}
-	return(num / 2);
+	return(num);
 }
 
 int	check_mtrx_pipe(char **mtrx)
@@ -402,6 +412,92 @@ char	**ft_split_quotes(char *str)
 	return(splited_argv);
 }
 
+size_t	ft_strlcat(char *dest, const char *src, size_t size)
+{
+	size_t	a;
+	size_t	i;
+
+	if (size <= ft_strlen(dest))
+		return (size + ft_strlen(src));
+	a = ft_strlen(dest);
+	i = 0;
+	while (src[i] != '\0' && a + 1 < size)
+	{
+		dest[a] = src[i];
+		a++;
+		i++;
+	}
+	dest[a] = '\0';
+	return (ft_strlen(dest) + ft_strlen (&src[i]));
+}
+
+size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
+{
+	size_t	i;
+
+	if (src == NULL || dst == NULL)
+		return (0);
+	i = 0;
+	if (dstsize != 0)
+	{
+		while (src[i] != '\0' && i < (dstsize - 1))
+		{
+			dst[i] = src[i];
+			i++;
+		}
+		dst[i] = '\0';
+	}
+	return (ft_strlen(src));
+}
+
+char	*ft_strjoin(char const *s1, char const *s2)
+{
+	char	*dest;
+	size_t	s1_len;
+	size_t	s2_len;
+
+	if (!s1 || !s2)
+		return (NULL);
+	s1_len = ft_strlen(s1);
+	s2_len = ft_strlen(s2);
+	dest = (char *)malloc(sizeof(char) * (s1_len + s2_len + 1));
+	if (!dest)
+		return (NULL);
+	ft_strlcpy(dest, s1, s1_len + 1);
+	ft_strlcat(&dest[s1_len], s2, s2_len + 1);
+	return (dest);
+}
+
+
+//todo: tiene que borrar comillas que no estén dentro de comillas
+void    dequoter(char **mtrx) //todo: mezclar con dequoter
+{
+    int i;
+	int len;
+    char **tempM;
+
+	len = 0;
+    i = 0;
+    while (mtrx[i])
+    {
+		if (change_caracter_q(mtrx[i]))
+		{
+			tempM = ft_split(mtrx[i], -128);
+			mtrx[i][0] = '\0';
+			while (tempM[len])
+			{
+				mtrx[i] = ft_strjoin(mtrx[i], tempM[len]);
+				free(tempM[len]);
+				len ++;
+			}
+			free(tempM);
+			len = 0;
+		}
+		printf("%s\n", mtrx[i]);
+        i ++;
+    }
+}
+
 int main()
 {
 	char str[40];
@@ -409,7 +505,7 @@ int main()
 	char **splited_argv2;
 	int i = 0;
 
-	ft_memcpy(str, "echo -n \"wc\"hola", 17);
+	ft_memcpy(str, "echo -n \'w\"c\'hola", 19);
 	if (open_quotes(str) < 0)
 	{
 		printf("Minishell: Syntax error\n");
@@ -417,12 +513,6 @@ int main()
 	}
 	else
 	{
-		// Split Pipes
-		// splited_argv = ft_split_pipes(str);
-		// if (!splited_argv)
-		// 	printf("NO habia pipes\n");
-		// else
-		// 	printf("Habia pipes\n");
 		splited_argv2 = ft_split_quotes(str);
 		if (splited_argv2[0][0] == -12)
 		{
@@ -430,9 +520,9 @@ int main()
 		}
 		if (splited_argv2)
 		{
+			dequoter(splited_argv2);
 			while(splited_argv2[i])
 			{
-				printf("%s\n", splited_argv2[i]);
 				free(splited_argv2[i]);
 				i ++;
 			}
