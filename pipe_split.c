@@ -499,39 +499,135 @@ void    dequoter(char **mtrx) //todo: mezclar con dequoter
     }
 }
 
+char	*ft_strdup(const char *s)
+{
+	char	*dest;
+
+	dest = (char *)malloc(sizeof(char) * ft_strlen(s) + 1);
+	if (!dest)
+		return (NULL);
+	ft_memcpy(dest, s, ft_strlen(s));
+	*(dest + ft_strlen(s)) = '\0';
+	return (dest);
+}
+
+void	add_character(char *name, char character)
+{
+	int i;
+	char *temp;
+
+	i = ft_strlen(name);
+	temp = ft_strdup(name);
+	free(name);
+	name = (char *)malloc(sizeof(char) * i + 1);
+	name[i] = character;
+	name[i + 1] = '\0';
+
+	free(temp);
+}
+
+// $ => si despues del dolar hay \0 o ' ', lo deja normal '$''
+// $? => me da el exit
+// $$ => me da el pid
+// $hola => expande la variable hola y si no existe, borra el '$'
+
+void	dolar_expand(char **mtrx, char **env)
+{
+	int i;
+	int j;
+	char *name;
+
+	i = 0;
+	j = 0;
+	name = ft_strdup("");
+	while (mtrx[i])
+	{
+		while (mtrx[i][j])
+		{
+			if (mtrx[i][j] == '$')
+			{
+				if (mtrx[i][j + 1])
+				{
+					if (mtrx[i][j + 1] == '?')
+						printf("0\n");
+					else if (mtrx[i][j + 1] == '$')
+						printf("12603\n");
+					else
+					{
+						while (mtrx[i][j + 1]) //encontrar nombre de variable
+						{
+							if (mtrx[i][j + 1] > 32)
+								add_character(name, mtrx[i][j + 1]);
+							else
+								break;
+							j ++;
+						}
+						printf("%s\n", name);
+					}
+				}
+			}
+			j ++;
+		}
+		j = 0;
+		i ++;
+	}
+}
+
 int main()
 {
-	char str[40];
-	char **splited_argv;
-	char **splited_argv2;
+	//char str[40];
+	// char **splited_argv;
+	// char **splited_argv2;
+	char **mtrx;
+	char **env;
 	int i = 0;
 
-	ft_memcpy(str, "echo -n wc\'ho\'la", 19);
-	if (open_quotes(str) < 0)
-	{
-		printf("Minishell: Syntax error\n");
-		return (0);
-	}
-	else
-	{
-		splited_argv2 = ft_split_quotes(str);
-		if (splited_argv2[0][0] == -12)
-		{
-			return(0);
-		}
-		if (splited_argv2)
-		{
-			dequoter(splited_argv2);
-			while(splited_argv2[i])
-			{
-				free(splited_argv2[i]);
-				i ++;
-			}
-			free(splited_argv2);
-		}
 
-	}
+	mtrx = (char **)malloc(sizeof(char *) * 5);
+	mtrx[0] = ft_strdup("echo");
+	mtrx[1] = ft_strdup("-n");
+	mtrx[2] = ft_strdup("$hola a");
+	mtrx[3] = ft_strdup("si");
+	mtrx[4] = "\0";
 
+
+	env = (char **)malloc(sizeof(char *) * 8);
+	env[0] = ft_strdup("XPC_SERVICE_NAME=0");
+	env[1] = ft_strdup("HOME=/Users/jelorria");
+	env[2] = ft_strdup("__CF_USER_TEXT_ENCODING=0x18B75:0x0:0x0");
+	env[3] = ft_strdup("PWD=/Users/jelorria/cursus/pipe_split2");
+	env[4] = ft_strdup("VSCODE_GIT_IPC_HANDLE=/var/folders/zz/zyxvpxvq6csfxvn_n000cbfm0032vn/T/vscode-git-cb4e196c2c.sock");
+	env[5] = ft_strdup("hola=tu");
+	env[6] = ft_strdup("TERM=xterm-256color");
+	env[7] = "\0";
+
+	dolar_expand(mtrx, env);
+
+	//ft_memcpy(str, "echo -n $hola tu", 40);
+	// if (open_quotes(str) < 0)
+	// {
+	// 	printf("Minishell: Syntax error\n");
+	// 	return (0);
+	// }
+	// else
+	// {
+	// 	splited_argv2 = ft_split_quotes(str);
+	// 	if (splited_argv2[0][0] == -12)
+	// 	{
+	// 		return(0);
+	// 	}
+	// 	if (splited_argv2)
+	// 	{
+	// 		dequoter(splited_argv2);
+	// 		while(splited_argv2[i])
+	// 		{
+	// 			free(splited_argv2[i]);
+	// 			i ++;
+	// 		}
+	// 		free(splited_argv2);
+	// 	}
+
+	// }
 
 	// //Split Comillas
 	// splited_argv2 = ft_split_quotes(str);
