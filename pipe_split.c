@@ -522,16 +522,44 @@ void	add_character(char *name, char character)
 	name = (char *)malloc(sizeof(char) * i + 1);
 	name[i] = character;
 	name[i + 1] = '\0';
-
 	free(temp);
 }
 
-// $ => si despues del dolar hay \0 o ' ', lo deja normal '$''
+int	check_expansion(char *name, char **env)
+{
+	int i;
+	int j;
+
+	i = 0;
+	j = 0;
+	while (env[i])
+	{
+		while (env[i][j])
+		{
+			if (env[i][j] == name[0])
+			{
+				
+			}
+			j ++;
+		}
+		i ++;
+	}
+}
+
+void	expand_value(char *str, char *name, char **env)
+{
+	if (check_expansion(name, env))
+	{
+
+	}
+}
+
+// $ => si despues del dolar hay \0 o ' ', lo deja normal '$'
 // $? => me da el exit
 // $$ => me da el pid
 // $hola => expande la variable hola y si no existe, borra el '$'
 
-void	dolar_expand(char **mtrx, char **env)
+void	dolar_expand(char *str, char **env)
 {
 	int i;
 	int j;
@@ -540,35 +568,32 @@ void	dolar_expand(char **mtrx, char **env)
 	i = 0;
 	j = 0;
 	name = ft_strdup("");
-	while (mtrx[i])
+	while (str[i])
 	{
-		while (mtrx[i][j])
+		if (str[i] == '$')
 		{
-			if (mtrx[i][j] == '$')
+			if (str[i + 1])
 			{
-				if (mtrx[i][j + 1])
+				if (str[i + 1] == '?')
+					printf("0\n");
+				else if (str[i + 1] == '$')
+					printf("12603\n");
+				else
 				{
-					if (mtrx[i][j + 1] == '?')
-						printf("0\n");
-					else if (mtrx[i][j + 1] == '$')
-						printf("12603\n");
-					else
+					while (str[i + 1])
 					{
-						while (mtrx[i][j + 1]) //encontrar nombre de variable
-						{
-							if (mtrx[i][j + 1] > 32)
-								add_character(name, mtrx[i][j + 1]);
-							else
-								break;
-							j ++;
-						}
-						printf("%s\n", name);
+						if (str[i + 1] > 32)
+							add_character(name, str[i + 1]);
+						else
+							break;
+						i ++;
 					}
+					printf("%s\n", name);
+					expand_value(str, name, env);
+					name = ft_strdup("");
 				}
 			}
-			j ++;
 		}
-		j = 0;
 		i ++;
 	}
 }
@@ -586,12 +611,12 @@ int main()
 	mtrx = (char **)malloc(sizeof(char *) * 5);
 	mtrx[0] = ft_strdup("echo");
 	mtrx[1] = ft_strdup("-n");
-	mtrx[2] = ft_strdup("$hola a");
+	mtrx[2] = ft_strdup("$hola $a");
 	mtrx[3] = ft_strdup("si");
 	mtrx[4] = "\0";
 
 
-	env = (char **)malloc(sizeof(char *) * 8);
+	env = (char **)malloc(sizeof(char *) * 9);
 	env[0] = ft_strdup("XPC_SERVICE_NAME=0");
 	env[1] = ft_strdup("HOME=/Users/jelorria");
 	env[2] = ft_strdup("__CF_USER_TEXT_ENCODING=0x18B75:0x0:0x0");
@@ -599,9 +624,10 @@ int main()
 	env[4] = ft_strdup("VSCODE_GIT_IPC_HANDLE=/var/folders/zz/zyxvpxvq6csfxvn_n000cbfm0032vn/T/vscode-git-cb4e196c2c.sock");
 	env[5] = ft_strdup("hola=tu");
 	env[6] = ft_strdup("TERM=xterm-256color");
-	env[7] = "\0";
+	env[7] = ft_strdup("a=yo");
+	env[8] = "\0";
 
-	dolar_expand(mtrx, env);
+	dolar_expand(mtrx[2], env);
 
 	//ft_memcpy(str, "echo -n $hola tu", 40);
 	// if (open_quotes(str) < 0)
