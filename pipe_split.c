@@ -536,11 +536,10 @@ int	check_expansion(char *name, char **env)
 	{
 		while (env[i][j])
 		{
-			if (env[i][j] == name[0])
+			if (env[i][j] == name[j])
 			{
 				
 			}
-			j ++;
 		}
 		i ++;
 	}
@@ -557,7 +556,9 @@ void	expand_value(char *str, char *name, char **env)
 // $ => si despues del dolar hay \0 o ' ', lo deja normal '$'
 // $? => me da el exit
 // $$ => me da el pid
-// $hola => expande la variable hola y si no existe, borra el '$'
+// $hola => expande la variable hola y //* si no existe, borra el '$'
+//* las comillas de dentro me la pelan, solo comparo las de fuera...
+//* si son, simples, NO hago el expand y si son dobles SI
 
 void	dolar_expand(char *str, char **env)
 {
@@ -578,7 +579,7 @@ void	dolar_expand(char *str, char **env)
 					printf("0\n");
 				else if (str[i + 1] == '$')
 					printf("12603\n");
-				else
+				else if (str[i + 1] >= 33 && str[i + 1] <= 126)
 				{
 					while (str[i + 1])
 					{
@@ -611,7 +612,7 @@ int main()
 	mtrx = (char **)malloc(sizeof(char *) * 5);
 	mtrx[0] = ft_strdup("echo");
 	mtrx[1] = ft_strdup("-n");
-	mtrx[2] = ft_strdup("$hola $a");
+	mtrx[2] = ft_strdup("$hola $'a' $si");
 	mtrx[3] = ft_strdup("si");
 	mtrx[4] = "\0";
 
