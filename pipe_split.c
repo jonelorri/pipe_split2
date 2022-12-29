@@ -11,6 +11,19 @@
 // 	return(i);
 // }
 
+// int	ft_strncmp(const char *s1, const char *s2, size_t n)
+// {
+// 	while ((n > 0) && (*s1 == *s2) && (*s1 != '\0'))
+// 	{
+// 		s1++;
+// 		s2++;
+// 		n--;
+// 	}
+// 	if (n == 0)
+// 		return (0);
+// 	return ((unsigned char)*s1 - (unsigned char)*s2);
+// }
+
 int	ft_strncmp(const char *s1, const char *s2, size_t n)
 {
 	size_t	a;
@@ -644,30 +657,31 @@ char	*expand_value(char *str, char *name, char **env, int start, int end)
 	return (str);
 }
 
-char	*delete_value(char *str, char *name, int start, int end)
+void	delete_value(char *str, char *name, int start, int end)
 {
-	char *first;
-	int i;
+	// char *first;
+	// int i;
 
 
-	i = 0;
-	first = malloc(ft_strlen(str));
-	first[0] = '\0';
-	while (str[i] && i < start)
-	{
-		first = add_character(first, str[i]);
-		i ++;
-	}
-	while (str[i])
-	{
-		if (i > end)
-		{
-			first = add_character(first, str[i]);
-		}
-		i ++;
-	}
-	free(str);
-	return(first);
+	// i = 0;
+	// first = malloc(ft_strlen(str));
+	// first[0] = '\0';
+	// while (str[i] && i < start)
+	// {
+	// 	first = add_character(first, str[i]);
+	// 	i ++;
+	// }
+	// while (str[i])
+	// {
+	// 	if (i > end)
+	// 	{
+	// 		first = add_character(first, str[i]);
+	// 	}
+	// 	i ++;
+	// }
+	// free(str);
+	// return(first);
+	str[start] = 'Z';
 }
 
 void	dolar_expand(char *str, char **env)
@@ -688,7 +702,7 @@ void	dolar_expand(char *str, char **env)
 		return ;
 	while (str[i])
 	{
-		if (str[i] == '$')
+		if (str[i] == '$' && ((str[i + 1] >= 65 && str[i + 1] <= 90) || (str[i + 1] >= 97 && str[i + 1] <= 122)))
 		{
 			if (str[i + 1])
 			{
@@ -719,15 +733,14 @@ void	dolar_expand(char *str, char **env)
 					printf("\n%s\n", name);
 					printf("-C=>%s\n", str);
 					str_temp = expand_value(str, name, env, start, end);
-					if (str_temp == str)
+					if (ft_strncmp(str_temp, str, 100))
 					{
-						str = delete_value(str, name, start, end);
+						delete_value(str, name, start, end);
 						printf("-H=>%s\n", str);
 					}
 					else
 						str = ft_strdup(str_temp);
 					printf("-V=>%s\n", str);
-					i = -1;
 					name = ft_strdup("");
 					flag = 0;
 				}
@@ -758,7 +771,7 @@ int main()
 	mtrx = (char **)malloc(sizeof(char *) * 5);
 	mtrx[0] = ft_strdup("echo");
 	mtrx[1] = ft_strdup("-n");
-	mtrx[2] = ft_strdup("\"$? $holaax $si $\"");
+	mtrx[2] = ft_strdup("$holaax $si $");
 	mtrx[3] = ft_strdup("si");
 	mtrx[4] = "\0";
 
