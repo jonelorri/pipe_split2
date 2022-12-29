@@ -11,6 +11,23 @@
 // 	return(i);
 // }
 
+int	ft_strncmp(const char *s1, const char *s2, size_t n)
+{
+	size_t	a;
+	size_t	b;
+
+	a = 0;
+	b = 0;
+	while ((s1[b] != '\0' || s2[b] != '\0') && a < n)
+	{
+		if (s1[b] != s2[b])
+			return ((unsigned char)s1[b] - (unsigned char)s2[b]);
+		a++;
+		b++;
+	}
+	return (0);
+}
+
 int open_pipes(char *str)
 {
 	int		i;
@@ -528,28 +545,196 @@ void	add_character(char *name, char character)
 int	check_expansion(char *name, char **env)
 {
 	int i;
-	int j;
 
 	i = 0;
-	j = 0;
 	while (env[i])
 	{
-		while (env[i][j])
+		if (!ft_strncmp(name, env[i], ft_strlen(name)) && env[i][ft_strlen(name)] == '=')
 		{
-			if (env[i][j] == name[j])
-			{
-				
-			}
+			printf("en linea -> %d\n", i);
+			return (i);
 		}
 		i ++;
 	}
+	return (0);
 }
 
-void	expand_value(char *str, char *name, char **env)
+char *copy_value(char *str)
 {
-	if (check_expansion(name, env))
-	{
+	int i;
+	int flag;
+	char *value;
 
+	value = ft_strdup("");
+	i = 0;
+	flag = 0;
+	while (str[i])
+	{
+		if (flag == 1)
+			add_character(value, str[i]);
+		if (str[i] == '=')
+			flag = 1;
+		i ++;
+	}
+	return (value);
+}
+
+char	*expanding(char *str, char *name, char *env, int start, int end)
+{
+	char *first;
+	char *value;
+	int i;
+	int total_len;
+	int prueba_len;
+
+	i = 0;
+	first = malloc(start);
+	first[0] = '\0';
+	value = copy_value(env);
+
+	// printf("\n---------\n");
+	// printf("%s\n", str);
+	// printf("%s\n", env);
+	// printf("%d\n", start);
+	// printf("%d\n", end);
+	// printf("%s\n", value);
+	// printf("---------\n");
+
+	while (i < start)
+	{
+		add_character(first, str[i]);
+		i ++;
+	}
+	// printf("->%s\n", first);
+	first = ft_strjoin(first, value);
+	// printf("->%s\n", first);
+
+	prueba_len = ft_strlen(first);
+	// printf("----->%d\n", prueba_len);
+
+	total_len = ft_strlen(str) - ft_strlen(name) - 1 + ft_strlen(value);
+	// printf("----->%d\n", total_len);
+
+	i = 0;
+	while (str[i] && total_len != prueba_len)
+	{
+		if (i > end)
+			add_character(first, str[i]);
+		i ++;
+	}
+	free(str);
+	str = ft_strdup(first);
+	free(first);
+	printf("->=>%s\n", str);
+	return (str);
+}
+
+char	*expand_value(char *str, char *name, char **env, int start, int end)
+{
+	int result;
+
+	result = check_expansion(name, env);
+	if (result)
+	{
+		str = expanding(str, name, env[result], start, end);
+		printf("->=>_>_>%s\n", str);
+		return (str);
+	}
+	return (str);
+}
+
+char	*delete_value(char *str, char *name, int start, int end)
+{
+	char *first;
+	int i;
+
+
+	i = 0;
+	first = malloc(ft_strlen(str));
+	first[0] = '\0';
+	while (str[i] && i < start)
+	{
+		add_character(first, str[i]);
+		i ++;
+	}
+	while (str[i])
+	{
+		if (i > end)
+		{
+			add_character(first, str[i]);
+		}
+		i ++;
+	}
+	first[i] = '\0';
+	free(str);
+	return(first);
+}
+
+void	dolar_expand(char *str, char **env)
+{
+	int i;
+	int j;
+	char *name;
+	int start;
+	int end;
+	int flag;
+	char *str_temp;
+
+	i = 0;
+	j = 0;
+	flag = 0;
+	name = ft_strdup("");
+	if (str[i] == '\'')
+		return ;
+	while (str[i])
+	{
+		if (str[i] == '$')
+		{
+			if (str[i + 1])
+			{
+				if (str[i + 1] == '?')
+				{
+					str[i] = 'X';
+					i ++;
+				}
+				else if (str[i + 1] == '$')
+				{
+					printf("14273\n");
+					i ++;
+				}
+				else if (str[i + 1] >= 48 && str[i + 1] <= 122)
+				{
+					while (str[i + 1])
+					{
+						if (flag == 0)
+							start = i;
+						end = i;
+						flag = 1;
+						if (str[i + 1] >= 48 && str[i + 1] <= 122)
+							add_character(name, str[i + 1]);
+						else
+							break;
+						i ++;
+					}
+					printf("\n%s\n", name);
+					printf("-C=>%s\n", str);
+					str_temp = expand_value(str, name, env, start, end);
+					if (str_temp == str)
+					{
+						str = delete_value(str, name, start, end);
+						printf("-H=>%s\n", str);
+					}
+					else
+						str = ft_strdup(str_temp);
+					printf("-V=>%s\n", str);
+					i = -1;
+					name = ft_strdup("");
+					flag = 0;
+				}
+			}
+		}
+		printf("-X=>%s\n", str);
+		i ++;
 	}
 }
 
@@ -559,45 +744,6 @@ void	expand_value(char *str, char *name, char **env)
 // $hola => expande la variable hola y //* si no existe, borra el '$'
 //* las comillas de dentro me la pelan, solo comparo las de fuera...
 //* si son, simples, NO hago el expand y si son dobles SI
-
-void	dolar_expand(char *str, char **env)
-{
-	int i;
-	int j;
-	char *name;
-
-	i = 0;
-	j = 0;
-	name = ft_strdup("");
-	while (str[i])
-	{
-		if (str[i] == '$')
-		{
-			if (str[i + 1])
-			{
-				if (str[i + 1] == '?')
-					printf("0\n");
-				else if (str[i + 1] == '$')
-					printf("12603\n");
-				else if (str[i + 1] >= 33 && str[i + 1] <= 126)
-				{
-					while (str[i + 1])
-					{
-						if (str[i + 1] > 32)
-							add_character(name, str[i + 1]);
-						else
-							break;
-						i ++;
-					}
-					printf("%s\n", name);
-					expand_value(str, name, env);
-					name = ft_strdup("");
-				}
-			}
-		}
-		i ++;
-	}
-}
 
 int main()
 {
@@ -612,7 +758,7 @@ int main()
 	mtrx = (char **)malloc(sizeof(char *) * 5);
 	mtrx[0] = ft_strdup("echo");
 	mtrx[1] = ft_strdup("-n");
-	mtrx[2] = ft_strdup("$hola $'a' $si");
+	mtrx[2] = ft_strdup("\"$? $holaax $si $\"");
 	mtrx[3] = ft_strdup("si");
 	mtrx[4] = "\0";
 
@@ -620,10 +766,10 @@ int main()
 	env = (char **)malloc(sizeof(char *) * 9);
 	env[0] = ft_strdup("XPC_SERVICE_NAME=0");
 	env[1] = ft_strdup("HOME=/Users/jelorria");
-	env[2] = ft_strdup("__CF_USER_TEXT_ENCODING=0x18B75:0x0:0x0");
+	env[2] = ft_strdup("hola__CF_hola_TEXT_ENCODING=0x18B75:0x0:0x0");
 	env[3] = ft_strdup("PWD=/Users/jelorria/cursus/pipe_split2");
 	env[4] = ft_strdup("VSCODE_GIT_IPC_HANDLE=/var/folders/zz/zyxvpxvq6csfxvn_n000cbfm0032vn/T/vscode-git-cb4e196c2c.sock");
-	env[5] = ft_strdup("hola=tu");
+	env[5] = ft_strdup("holaax=tu");
 	env[6] = ft_strdup("TERM=xterm-256color");
 	env[7] = ft_strdup("a=yo");
 	env[8] = "\0";
