@@ -528,7 +528,7 @@ char	*ft_strdup(const char *s)
 	return (dest);
 }
 
-void	add_character(char *name, char character)
+char	*add_character(char *name, char character)
 {
 	int i;
 	char *temp;
@@ -536,10 +536,11 @@ void	add_character(char *name, char character)
 	i = ft_strlen(name);
 	temp = ft_strdup(name);
 	free(name);
-	name = (char *)malloc(sizeof(char) * i + 1);
+	name = (char *)malloc(sizeof(char) * i + 2);
 	name[i] = character;
 	name[i + 1] = '\0';
 	free(temp);
+	return (name);
 }
 
 int	check_expansion(char *name, char **env)
@@ -571,7 +572,7 @@ char *copy_value(char *str)
 	while (str[i])
 	{
 		if (flag == 1)
-			add_character(value, str[i]);
+			value = add_character(value, str[i]);
 		if (str[i] == '=')
 			flag = 1;
 		i ++;
@@ -602,7 +603,7 @@ char	*expanding(char *str, char *name, char *env, int start, int end)
 
 	while (i < start)
 	{
-		add_character(first, str[i]);
+		first = add_character(first, str[i]);
 		i ++;
 	}
 	// printf("->%s\n", first);
@@ -619,7 +620,7 @@ char	*expanding(char *str, char *name, char *env, int start, int end)
 	while (str[i] && total_len != prueba_len)
 	{
 		if (i > end)
-			add_character(first, str[i]);
+			first = add_character(first, str[i]);
 		i ++;
 	}
 	free(str);
@@ -654,18 +655,17 @@ char	*delete_value(char *str, char *name, int start, int end)
 	first[0] = '\0';
 	while (str[i] && i < start)
 	{
-		add_character(first, str[i]);
+		first = add_character(first, str[i]);
 		i ++;
 	}
 	while (str[i])
 	{
 		if (i > end)
 		{
-			add_character(first, str[i]);
+			first = add_character(first, str[i]);
 		}
 		i ++;
 	}
-	first[i] = '\0';
 	free(str);
 	return(first);
 }
@@ -711,7 +711,7 @@ void	dolar_expand(char *str, char **env)
 						end = i;
 						flag = 1;
 						if (str[i + 1] >= 48 && str[i + 1] <= 122)
-							add_character(name, str[i + 1]);
+							name = add_character(name, str[i + 1]);
 						else
 							break;
 						i ++;
