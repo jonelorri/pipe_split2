@@ -2,47 +2,53 @@
 
 int pid = 31559;
 
-// char	*add_character(char *str, char character)
-// {
-//     char *dest;
-//     int i;
+void add_pid(char *dst, char *pid, int pos)
+{
+    int i;
 
-//     i = ft_strlen(str);
-//     printf("%s\n", str);
-//     dest = malloc(i + 2);
-//     dest[0] = '\0';
-//     i = 0;
-//     while (str[i])
-//     {
-//         *dest++ = *str++;
-//         i ++;
-//     }
-//     *dest = character;
-//     *dest = '\0';
-    
-//     free(str);
-// 	return (dest);
-// }
+    i = 0;
+    while (pid[i])
+    {
+        dst[pos] = pid[i];
+        i ++;
+        pos ++;
+    }
+}
+
+void add_final(char *dst, char *str, int pos)
+{
+    int i;
+
+    i = ft_strlen(dst);
+    while (str[pos])
+    {
+        dst[i] = str[pos];
+        i ++;
+        pos ++;
+    }
+    dst[i] = '\0';
+}
 
 char *expand_pid(char *str, int pos)
 {
-    char *pid2;
     int pid_len;
+    char *pid2;
     char *temp;
     int i;
 
     pid2 = ft_itoa(pid);
     pid_len = ft_strlen(pid2);
 
-    temp = malloc(pos + 1);
-    ft_strlcpy(temp, str, pos);
-    printf("%s\n", temp);
-    free(temp);
+    temp = malloc(ft_strlen(str) + pid_len + 1);
+    ft_strlcpy(temp, str, pos + 1);
+    add_pid(temp, pid2, pos);
+    add_final(temp, str, pos + 2);
+
+    str[pos] = 'Z';
 
     free(pid2);
-    str[pos] = 'Z';
-    printf("%s\n", str);
-    return (str);
+    free(str);
+    return (temp);
 }
 
 char *expand_error(char *str, int i)
