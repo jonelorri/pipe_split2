@@ -15,5 +15,6 @@ char	*ft_strdup(const char *s);
 void    ft_free(char **mtrx);
 char	*ft_itoa(int n);
 size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize);
+size_t	ft_strlcat(char *dest, const char *src, size_t size);
 
 #endif

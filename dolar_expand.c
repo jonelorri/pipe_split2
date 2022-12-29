@@ -1,13 +1,18 @@
 #include "dolar_expand.h"
 
-int pid = 31559;
+int pid = 145986;
+int error1 = 0;
 
-void add_pid(char *dst, char *pid, int pos)
+void add_pid(char *dst, char *pid, int len)
 {
     int i;
+    int pos;
 
     i = 0;
-    while (pid[i])
+    pos = 0;
+    while (dst[pos])
+        pos ++;
+    while (i < len)
     {
         dst[pos] = pid[i];
         i ++;
@@ -34,27 +39,39 @@ char *expand_pid(char *str, int pos)
     int pid_len;
     char *pid2;
     char *temp;
-    int i;
 
     pid2 = ft_itoa(pid);
     pid_len = ft_strlen(pid2);
 
     temp = malloc(ft_strlen(str) + pid_len + 1);
     ft_strlcpy(temp, str, pos + 1);
-    add_pid(temp, pid2, pos);
+    ft_strlcat(temp, pid2, pid_len + ft_strlen(temp) + 1);
     add_final(temp, str, pos + 2);
-
-    str[pos] = 'Z';
 
     free(pid2);
     free(str);
     return (temp);
 }
 
-char *expand_error(char *str, int i)
+char *expand_error(char *str, int pos)
 {
-    str[i] = 'Z';
-    return (str);
+    int error_len;
+    char *error2;
+    char *temp;
+    int i;
+
+    i = 0;
+    error2 = ft_itoa(error1);
+    error_len = ft_strlen(error2);
+
+    temp = malloc(ft_strlen(str) + error_len + 1);
+    ft_strlcpy(temp, str, pos + 1);
+    ft_strlcat(temp, error2, error_len + ft_strlen(temp) + 1);
+    add_final(temp, str, pos + 2);
+
+    free(error2);
+    free(str);
+    return (temp);
 }
 
 char *expand(char *str, int i)
@@ -75,7 +92,9 @@ char *dolar_expand(char *str, char **env)
         if (str[i] == '$' && str[i + 1] && str[i + 1] > 32 && str[i + 1] != 34)
         {
             if (str[i + 1] == '$')
+            {
                 str = expand_pid(str, i);
+            }
             else
             {
                 while (str[i + 1] && str[i + 1] != '$')
@@ -110,7 +129,7 @@ int main()
 	mtrx = (char **)malloc(sizeof(char *) * 6);
 	mtrx[0] = ft_strdup("echo");
 	mtrx[1] = ft_strdup("-n");
-	mtrx[2] = ft_strdup("\"$holaax $ $? $$ $si $\"");
+	mtrx[2] = ft_strdup("\"$holaax $ $$ $? $si $\"");
 	mtrx[3] = ft_strdup("$");
 	mtrx[4] = ft_strdup("si");
 	mtrx[5] = NULL;

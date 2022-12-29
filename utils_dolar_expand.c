@@ -10,6 +10,25 @@ size_t	ft_strlen(const char *str)
 	return(i);
 }
 
+size_t	ft_strlcat(char *dest, const char *src, size_t size)
+{
+	size_t	a;
+	size_t	i;
+
+	if (size <= ft_strlen(dest))
+		return (size + ft_strlen(src));
+	a = ft_strlen(dest);
+	i = 0;
+	while (src[i] != '\0' && a + 1 < size)
+	{
+		dest[a] = src[i];
+		a++;
+		i++;
+	}
+	dest[a] = '\0';
+	return (ft_strlen(dest) + ft_strlen (&src[i]));
+}
+
 size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
 {
 	size_t	i;
