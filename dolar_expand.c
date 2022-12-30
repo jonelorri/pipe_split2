@@ -74,9 +74,90 @@ char *expand_error(char *str, int pos)
     return (temp);
 }
 
-char *expand(char *str, int i)
+int	check_expansion(char *name, char **env)
 {
+	int i;
+
+	i = 0;
+	while (env[i])
+	{
+		if (!ft_strncmp(name, env[i], ft_strlen(name)) && env[i][ft_strlen(name)] == '=')
+			return (i);
+		i ++;
+	}
+	return (0);
+}
+
+char *find_word(char *str, int i)
+{
+    char *dst;
+    int j;
+	int word_len;
+	int pos;
+
+    j = 0;
+    pos = i;
+    word_len = 0;
+    while (ft_isalnum(str[i + 1]))
+    {
+        i ++;
+        word_len ++;
+    }
+    dst = malloc(word_len + 1);
+    dst[0] = '\0';
+    i = pos;
+    while (ft_isalnum(str[i + 1]))
+    {
+        dst[j] = str[i + 1];
+        i ++;
+        j ++;
+    }
+    dst[j] = '\0';
+    return (dst);
+}
+
+char *find_value(char *env)
+{
+    int start;
+    int end;
+    char *value;
+
+    start = 0;
+    end = 0;
+    while (env[start] != '=')
+        start ++;
+    while (env[end])
+        end ++;
+    value = malloc(end - start + 1);
+    //todo: copiar el valor en 'value';
+    return (value);
+}
+
+char *expanding(char *str, char *word, char *env, int pos)
+{
+    char *value;
+
+    value = find_value(env);
+    printf("%s\n", value);
+
+    free(value);
+    return (str);
+}
+
+char *expand(char *str, int i, char **env)
+{
+    char *word;
+    int line;
+
+    word = find_word(str, i);
+    line = check_expansion(word, env);
+    if (line)
+    {
+        str = expanding(str, word, env[line], i);
+    }
+
     str[i] = 'Z';
+    free(word);
     return (str);
 }
 
@@ -92,9 +173,7 @@ char *dolar_expand(char *str, char **env)
         if (str[i] == '$' && str[i + 1] && str[i + 1] > 32 && str[i + 1] != 34)
         {
             if (str[i + 1] == '$')
-            {
                 str = expand_pid(str, i);
-            }
             else
             {
                 while (str[i + 1] && str[i + 1] != '$')
@@ -106,7 +185,7 @@ char *dolar_expand(char *str, char **env)
                     }
                     else
                     {
-                        str = expand(str, i);
+                        str = expand(str, i, env);
                         break ;
                     }
                     i ++;
@@ -129,7 +208,7 @@ int main()
 	mtrx = (char **)malloc(sizeof(char *) * 6);
 	mtrx[0] = ft_strdup("echo");
 	mtrx[1] = ft_strdup("-n");
-	mtrx[2] = ft_strdup("\"$holaax $ $$ $? $si $\"");
+	mtrx[2] = ft_strdup("\"$holaax $ $$$? $?$ $si $\"");
 	mtrx[3] = ft_strdup("$");
 	mtrx[4] = ft_strdup("si");
 	mtrx[5] = NULL;

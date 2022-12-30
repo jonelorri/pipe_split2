@@ -1,5 +1,26 @@
 #include "dolar_expand.h"
 
+int	ft_isalnum(int c)
+{
+	if ((c >= 65 && c <= 90) || (c >= 97 && c <= 122) || (c >= 48 && c <= 57))
+		return (1);
+	else
+		return (0);
+}
+
+int	ft_strncmp(const char *s1, const char *s2, size_t n)
+{
+	while ((n > 0) && (*s1 == *s2) && (*s1 != '\0'))
+	{
+		s1++;
+		s2++;
+		n--;
+	}
+	if (n == 0)
+		return (0);
+	return ((unsigned char)*s1 - (unsigned char)*s2);
+}
+
 size_t	ft_strlen(const char *str)
 {
 	size_t i;
