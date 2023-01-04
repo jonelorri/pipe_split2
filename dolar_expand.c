@@ -64,7 +64,8 @@ char	*expand_error(char *str, int pos)
 	ft_strlcpy(temp, str, pos + 1);
 	ft_strlcat(temp, error2, error_len + ft_strlen(temp) + 1);
 	add_final(temp, str, pos + 2);
-	temp[pos + 2] = '\0';
+	if (error_len == 1)
+		temp[pos + 2] = '\0';
 	free(error2);
 	free(str);
 	return (temp);
@@ -80,10 +81,20 @@ int	check_expansion(char *name, char **env)
 	{
 		c = env[i][ft_strlen(name)];
 		if (!ft_strncmp(name, env[i], ft_strlen(name)) && c == '=')
-			return (i);
+	    	return (i);
 		i ++;
 	}
-	return (0);
+	return (-1);
+}
+
+int	ismynum(int c)
+{
+	if ((c >= 65 && c <= 90) || (c >= 97 && c <= 122) || (c >= 48 && c <= 57))
+		return (1);
+    else if (c == '_')
+        return (1);
+	else
+		return (0);
 }
 
 char	*find_word(char *str, int i)
@@ -96,7 +107,7 @@ char	*find_word(char *str, int i)
 	j = 0;
 	pos = i;
 	word_len = 0;
-	while (ft_isalnum(str[i + 1]))
+	while (ismynum(str[i + 1]))
 	{
 		i ++;
 		word_len ++;
@@ -104,7 +115,7 @@ char	*find_word(char *str, int i)
 	dst = malloc(word_len + 1);
 	dst[0] = '\0';
 	i = pos;
-	while (ft_isalnum(str[i + 1]))
+	while (ismynum(str[i + 1]))
 	{
 		dst[j] = str[i + 1];
 		i ++;
@@ -175,7 +186,7 @@ char	*expand(char *str, int i, char **env)
 
 	word = find_word(str, i);
 	line = check_expansion(word, env);
-	if (line)
+	if (line > -1)
 		str = expanding(str, word, env[line], i);
 	else
 		str = expand_delete(str, word, i);
@@ -240,39 +251,41 @@ char	**dolar_expand(char **mtrx, char **env)
 	return (mtrx);
 }
 
-int	main()
+int main()
 {
-	char	**mtrx;
-	char	**env;
-	int		i = 0;
+	char **mtrx;
+	char **env;
+	int i = 0;
 
 
 	mtrx = (char **)malloc(sizeof(char *) * 6);
-	mtrx[0] = ft_strdup("echo");
-	mtrx[1] = ft_strdup("$a");
-	mtrx[2] = ft_strdup("noo$h $sii$?");
-	mtrx[3] = ft_strdup("$?");
-	mtrx[4] = ft_strdup("si");
+	mtrx[0] = ft_strdup("$HOME");
+	mtrx[1] = ft_strdup("-n");
+	mtrx[2] = ft_strdup("$LC_TERMINAL_VERSION");
+	mtrx[3] = ft_strdup("$LaunchInstanceID");
+	mtrx[4] = ft_strdup("$USER");
 	mtrx[5] = NULL;
 
 
-	env = (char **)malloc(sizeof(char *) * 9);
-	env[0] = ft_strdup("XPC_SERVICE_NAME=0");
-	env[1] = ft_strdup("HOME=/Users/jelorria");
-	env[2] = ft_strdup("hola__CF_hola_TEXT_ENCODING=0x18B75:0x0:0x0");
-	env[3] = ft_strdup("PWD=/Users/jelorria/cursus/pipe_split2");
-	env[4] = ft_strdup("VSCODE_GIT_IPC_HANDLE=/var/folders/zz/zyxvpxvq6csfxvn_n000cbfm0032vn/T/vscode-git-cb4e196c2c.sock");
-	env[5] = ft_strdup("holaax=tu");
-	env[6] = ft_strdup("TERM=xterm-256color");
-	env[7] = ft_strdup("a=yo");
-	env[8] = NULL;
+	env = (char **)malloc(sizeof(char *) * 10);
+	env[0] = ft_strdup("HOME=/Users/jelorria");
+	env[1] = ft_strdup("LC_TERMINAL_VERSION=3.4.19");
+	env[2] = ft_strdup("LaunchInstanceID=18B8ECC9-CBC0-4AE8-9EC8-3360FA90EA42");
+	env[3] = ft_strdup("hola__CF_hola_TEXT_ENCODING=0x18B75:0x0:0x0");
+	env[4] = ft_strdup("PWD=/Users/jelorria/cursus/pipe_split2");
+	env[5] = ft_strdup("VSCODE_GIT_IPC_HANDLE=/var/folders/zz/zyxvpxvq6csfxvn_n000cbfm0032vn/T/vscode-git-cb4e196c2c.sock");
+	env[6] = ft_strdup("USER=jonelorriaga");
+	env[7] = ft_strdup("TERM=xterm-256color");
+	env[8] = ft_strdup("a=yo");
+	env[9] = NULL;
 
-	printf("%s\n\n", mtrx[2]);
 	mtrx = dolar_expand(mtrx, env);
-	printf("%s\n", mtrx[1]);
-	printf("%s\n", mtrx[2]);
-	printf("%s\n", mtrx[3]);
+    printf("0->%s\n", mtrx[0]);
+    printf("1->%s\n", mtrx[1]);
+    printf("2->%s\n", mtrx[2]);
+    printf("3->%s\n", mtrx[3]);
+    printf("4->%s\n", mtrx[4]);
 
-	ft_free(mtrx);
-	ft_free(env);
+    ft_free(mtrx);
+    ft_free(env);
 }
