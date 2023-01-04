@@ -75,11 +75,13 @@ int	check_expansion(char *name, char **env)
 {
 	int		i;
 	char	c;
+	char	len;
 
 	i = 0;
 	while (env[i])
 	{
-		c = env[i][ft_strlen(name)];
+		len = ft_strlen(name);
+		c = env[i][len];
 		if (!ft_strncmp(name, env[i], ft_strlen(name)) && c == '=')
 	    	return (i);
 		i ++;
@@ -261,7 +263,7 @@ int main()
 	mtrx = (char **)malloc(sizeof(char *) * 6);
 	mtrx[0] = ft_strdup("$HOME");
 	mtrx[1] = ft_strdup("-n");
-	mtrx[2] = ft_strdup("$LC_TERMINAL_VERSION");
+	mtrx[2] = ft_strdup("$MallocNanoZone");
 	mtrx[3] = ft_strdup("$LaunchInstanceID");
 	mtrx[4] = ft_strdup("$USER");
 	mtrx[5] = NULL;
@@ -269,9 +271,9 @@ int main()
 
 	env = (char **)malloc(sizeof(char *) * 10);
 	env[0] = ft_strdup("HOME=/Users/jelorria");
-	env[1] = ft_strdup("LC_TERMINAL_VERSION=3.4.19");
+	env[1] = ft_strdup("MallocNanoZone=0");
 	env[2] = ft_strdup("LaunchInstanceID=18B8ECC9-CBC0-4AE8-9EC8-3360FA90EA42");
-	env[3] = ft_strdup("hola__CF_hola_TEXT_ENCODING=0x18B75:0x0:0x0");
+	env[3] = ft_strdup("LC_TERMINAL_VERSIONZ=0asd");
 	env[4] = ft_strdup("PWD=/Users/jelorria/cursus/pipe_split2");
 	env[5] = ft_strdup("VSCODE_GIT_IPC_HANDLE=/var/folders/zz/zyxvpxvq6csfxvn_n000cbfm0032vn/T/vscode-git-cb4e196c2c.sock");
 	env[6] = ft_strdup("USER=jonelorriaga");
